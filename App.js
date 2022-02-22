@@ -7,6 +7,7 @@ import { Text } from "react-native";
 import ActivityIndicator from "./app/components/ActivityIndicator";
 import Context from "./app/context/Context";
 import ContextWrapper from "./app/context/ContextWrapper";
+import Contacts from "./app/screens/Contacts";
 import Home from "./app/screens/Home";
 import Profile from "./app/screens/Profile";
 import SignIn from "./app/screens/SignIn";
@@ -64,6 +65,11 @@ function App() {
 						name='home'
 						component={Home}
 						options={{ title: "Whatsapp" }}
+					/>
+					<Stack.Screen
+						name='contacts'
+						component={Contacts}
+						options={{ title: "Select Contact" }}
 					/>
 				</Stack.Navigator>
 			)}
