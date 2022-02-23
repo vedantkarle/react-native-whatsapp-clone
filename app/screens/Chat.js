@@ -10,19 +10,23 @@ import {
 } from "firebase/firestore";
 import { nanoid } from "nanoid";
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { ImageBackground, TouchableOpacity } from "react-native";
+import { Image, ImageBackground, TouchableOpacity, View } from "react-native";
 import {
 	Actions,
 	Bubble,
 	GiftedChat,
 	InputToolbar,
 } from "react-native-gifted-chat";
+import ImageView from "react-native-image-viewing";
 import { auth, db } from "../../firebase";
+import { pickImage, uploadImage } from "../../utils";
 import Context from "../context/Context";
 
 const Chat = () => {
 	const [roomHash, setRoomHash] = useState("");
 	const [messages, setMessages] = useState([]);
+	const [modalVisible, setModalVisible] = useState(false);
+	const [selectedImageView, setSelectedImageView] = useState("");
 
 	const {
 		theme: { colors },
@@ -98,14 +102,42 @@ const Chat = () => {
 				.map(({ doc }) => {
 					const message = doc.data();
 					return { ...message, createdAt: message.createdAt.toDate() };
-				});
+				})
+				.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 			appendMessages(messagesFirestore);
 		});
 
 		return () => unsubscribe();
 	}, []);
 
-	const handlePhoto = () => {};
+	const sendImage = async (uri, roomPath) => {
+		const { url, fileName } = await uploadImage(
+			uri,
+			`images/rooms/${roomPath || roomHash}`,
+		);
+
+		const message = {
+			_id: fileName,
+			text: "",
+			createdAt: new Date(),
+			user: senderUser,
+			image: url,
+		};
+
+		const lastMessage = { ...message, text: "Image" };
+
+		await Promise.all([
+			addDoc(roomMessagesRef, message),
+			updateDoc(roomRef, lastMessage),
+		]);
+	};
+
+	const handlePhoto = async () => {
+		const result = await pickImage();
+		if (!result.cancelled) {
+			await sendImage(result.uri);
+		}
+	};
 
 	const onSend = async (msgs = []) => {
 		const writes = msgs.map(m => addDoc(roomMessagesRef, m));
@@ -186,6 +218,40 @@ const Chat = () => {
 						}}
 					/>
 				)}
+				renderMessageImage={props => {
+					return (
+						<View style={{ borderRadius: 15, padding: 2 }}>
+							<TouchableOpacity
+								onPress={() => {
+									setSelectedImageView(props.currentMessage.image);
+									setModalVisible(true);
+								}}>
+								<Image
+									resizeMode='contain'
+									style={{
+										width: 200,
+										height: 200,
+										padding: 6,
+										borderRadius: 15,
+										resizeMode: "cover",
+									}}
+									source={{ uri: props.currentMessage.image }}
+								/>
+								{selectedImageView ? (
+									<ImageView
+										imageIndex={0}
+										visible={modalVisible}
+										onRequestClose={() => {
+											setModalVisible(false);
+											setSelectedImageView("");
+										}}
+										images={[{ uri: selectedImageView }]}
+									/>
+								) : null}
+							</TouchableOpacity>
+						</View>
+					);
+				}}
 			/>
 		</ImageBackground>
 	);
