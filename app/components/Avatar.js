@@ -6,8 +6,8 @@ const Avatar = ({ size, user }) => {
 		<Image
 			style={{ width: size, height: size, borderRadius: size }}
 			source={
-				user?.photoUrl
-					? { uri: user.photoUrl }
+				user?.photoURL
+					? { uri: user.photoURL }
 					: require("../../assets/icon-square.png")
 			}
 			resizeMode='cover'

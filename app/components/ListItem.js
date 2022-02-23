@@ -45,7 +45,7 @@ const ListItem = ({ type, style, description, user, time, room, image }) => {
 						{time && (
 							<Col style={{ alignItems: "flex-end" }}>
 								<Text style={{ color: colors.secondaryText, fontSize: 11 }}>
-									{new Data(time.seconds * 1000).toLocaleDateString()}
+									{new Date(time.seconds * 1000).toLocaleDateString()}
 								</Text>
 							</Col>
 						)}

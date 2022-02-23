@@ -49,22 +49,22 @@ const Profile = () => {
 	const handlePress = async () => {
 		setLoading(true);
 		const user = auth.currentUser;
-		let photoUrl;
+		let photoURL;
 		if (selectedImage) {
 			const { url } = await uploadImage(
 				selectedImage,
 				`images/${user.uid}`,
 				"profilePicture",
 			);
-			photoUrl = url;
+			photoURL = url;
 		}
 		const userData = {
 			displayName,
 			email: user.email,
 		};
 
-		if (photoUrl) {
-			userData.photoUrl = photoUrl;
+		if (photoURL) {
+			userData.photoURL = photoURL;
 		}
 
 		await Promise.all([

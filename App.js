@@ -3,15 +3,22 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { useAssets } from "expo-asset";
 import { onAuthStateChanged } from "firebase/auth";
 import React, { useContext, useEffect, useState } from "react";
-import { Text } from "react-native";
+import { LogBox, Text } from "react-native";
 import ActivityIndicator from "./app/components/ActivityIndicator";
+import ChatHeader from "./app/components/ChatHeader";
 import Context from "./app/context/Context";
 import ContextWrapper from "./app/context/ContextWrapper";
+import Chat from "./app/screens/Chat";
 import Contacts from "./app/screens/Contacts";
 import Home from "./app/screens/Home";
 import Profile from "./app/screens/Profile";
 import SignIn from "./app/screens/SignIn";
 import { auth } from "./firebase";
+
+LogBox.ignoreLogs([
+	"Setting a timer",
+	"AsyncStorage has been extracted from react-native core and will be removed in a future release.",
+]);
 
 function App() {
 	const [currUser, setCurrUser] = useState(null);
@@ -70,6 +77,13 @@ function App() {
 						name='contacts'
 						component={Contacts}
 						options={{ title: "Select Contact" }}
+					/>
+					<Stack.Screen
+						name='chat'
+						component={Chat}
+						options={{
+							headerTitle: props => <ChatHeader {...props} />,
+						}}
 					/>
 				</Stack.Navigator>
 			)}
